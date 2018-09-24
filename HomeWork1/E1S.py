@@ -6,6 +6,8 @@ import math
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
 import weight
 
 stoplist=stopwords.words('english')
@@ -26,28 +28,33 @@ def file_list(dirlist):
             for file in filename:
                 filelist.append(os.path.join(root,file))
     return filelist
-    
-#将所有的标点符号转化为空格在进行计算
+
+#使用nltk库进行数据的分词等操作
 def splitword(filelist):
     matrix=dict()
     wlist=dict()
+    i=1
     for filename in filelist:
         f=open(filename,'r',errors='ignore')
-        alltext=re.sub('\W+','\n',f.read()).replace('_',' ').split()
-        alltext=[PS.stem(words.lower()) for words in alltext if not any(ch.isnumeric() for ch in words)  and len(words)>1]
-        f.close()
-        alltext=[word for word in alltext if word not in stoplist]
-        for wordz in alltext:
-           if wordz not in diffwords.keys():
-               diffwords[wordz]=set([filename])
-           else :
-               diffwords.get(wordz).add(filename)
-           if wordz not in wlist.keys():
-               wlist[wordz]=1
-           else :
-               wlist[wordz]=wlist.get(wordz)+1
+        sentences=sent_tokenize(f.read())
+        for sentence in sentences:
+            words=word_tokenize(sentence)
+            words=[PS.stem(word.lower()) for word in words if not any(ch.isnumeric() for ch in word) and all(ch.isalpha() for ch in word) and len(word)>1]
+            words=[word for word in words if word not in stoplist]
+            for wordz in words:
+                if wordz not in diffwords.keys():
+                    diffwords[wordz]=set([filename])
+                else :
+                    diffwords.get(wordz).add(filename)
+                if wordz not in wlist.keys():
+                    wlist[wordz]=1
+                else :
+                    wlist[wordz]=wlist.get(wordz)+1
         matrix[filename]=wlist
         wlist={}
+        print(i)
+        i=i+1
+    print(len(diffwords))
     print('done')
     return matrix
 
