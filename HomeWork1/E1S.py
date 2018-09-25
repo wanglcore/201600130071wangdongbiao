@@ -33,36 +33,32 @@ def file_list(dirlist):
 def splitword(filelist):
     matrix=dict()
     wlist=dict()
-    i=1
     for filename in filelist:
         f=open(filename,'r',errors='ignore')
         sentences=sent_tokenize(f.read())
         for sentence in sentences:
             words=word_tokenize(sentence)
-            words=[PS.stem(word.lower()) for word in words if not any(ch.isnumeric() for ch in word) and all(ch.isalpha() for ch in word) and len(word)>1]
-            words=[word for word in words if word not in stoplist]
             for wordz in words:
-                if wordz not in diffwords.keys():
-                    diffwords[wordz]=set([filename])
-                else :
-                    diffwords.get(wordz).add(filename)
-                if wordz not in wlist.keys():
-                    wlist[wordz]=1
-                else :
-                    wlist[wordz]=wlist.get(wordz)+1
+                if all(ch.isalpha() for ch in wordz) and not any(ch.isnumeric() for ch in wordz) and len(wordz)>1:
+                    wordz=PS.stem(wordz.lower())
+                    if wordz not in stoplist:
+                        if wordz not in diffwords.keys():
+                            diffwords[wordz]=1
+                        else :
+                            diffwords[wordz]=diffwords[wordz]+1
+                        if wordz not in wlist.keys():
+                            wlist[wordz]=1
+                        else :
+                            wlist[wordz]=wlist[wordz]+1
         matrix[filename]=wlist
         wlist={}
-        print(i)
-        i=i+1
-    print(len(diffwords))
-    print('done')
     return matrix
 
 def main():
     dirlist=dir_list('C:\\Users\wangl\\Downloads\\20news-18828\\')
     filelist=file_list(dirlist)
     matrix=splitword(filelist)
-    mmatrix=weight.tfidf(len(filelist),diffwords,matrix)
+    weight.tfidf(len(filelist),diffwords,matrix)
     #mmatrix=weight.wfidf(len(filelist),diffwords,matrix)
 
 if __name__=="__main__":
