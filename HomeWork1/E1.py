@@ -34,28 +34,28 @@ def splitword(filelist):
     for filename in filelist:
         f=open(filename,'r',errors='ignore')
         alltext=re.sub('\W+','\n',f.read()).replace('_',' ').split()
-        alltext=[PS.stem(words.lower()) for words in alltext if not any(ch.isnumeric() for ch in words)  and len(words)>1]
         f.close()
-        alltext=[word for word in alltext if word not in stoplist]
         for wordz in alltext:
-           if wordz not in diffwords.keys():
-               diffwords[wordz]=set([filename])
-           else :
-               diffwords.get(wordz).add(filename)
-           if wordz not in wlist.keys():
-               wlist[wordz]=1
-           else :
-               wlist[wordz]=wlist.get(wordz)+1
-        matrix[filename]=wlist
-        wlist={}
-    print('done')
+           if (not any(ch.isnumeric() for ch in wordz)) and len(wordz)>1:
+               wordz=PS.stem(wordz.lower())
+               if wordz not in stoplist:
+                   if wordz not in diffwords.keys():
+                       diffwords[wordz]=1
+                   else:
+                        diffwords[wordz]=diffwords[wordz]+1
+                   if wordz not in wlist.keys():
+                       wlist[wordz]=1
+                   else :
+                       wlist[wordz]=wlist[wordz]+1
+                   matrix[filename]=wlist
+                   wlist={}
     return matrix
 
 def main():
     dirlist=dir_list('C:\\Users\wangl\\Downloads\\20news-18828\\')
     filelist=file_list(dirlist)
     matrix=splitword(filelist)
-    mmatrix=weight.tfidf(len(filelist),diffwords,matrix)
+    weight.tfidf(len(filelist),diffwords,matrix)
     #mmatrix=weight.wfidf(len(filelist),diffwords,matrix)
 
 if __name__=="__main__":
