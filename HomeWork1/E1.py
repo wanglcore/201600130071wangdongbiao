@@ -47,8 +47,8 @@ def splitword(filelist):
                        wlist[wordz]=1
                    else :
                        wlist[wordz]=wlist[wordz]+1
-                   matrix[filename]=wlist
-                   wlist={}
+        matrix[filename]=wlist
+        wlist={}
     return matrix
 
 def main():
