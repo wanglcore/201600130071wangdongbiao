@@ -82,6 +82,7 @@ def adb(querystr: list,worddict:dict):
     resultlist = []
     # 只含有 and 查询
     if 'or' not in querystr and 'not' not in querystr:
+        querystr=[item for item in querystr if item!='('and item!=')']
         for i in querystr:
             if i != 'and' and i not in stops:
                 qustr[i] = len(worddict[i])
@@ -92,6 +93,7 @@ def adb(querystr: list,worddict:dict):
         return resultlist
     # 只含有or查询
     elif 'and' not in querystr and 'not' not in querystr:
+        querystr=[item for item in querystr if item!='('and item!=')']
         for i in querystr:
             if i != 'or' and i not in stops:
                 qustr[i] = len(worddict[i])
@@ -102,6 +104,7 @@ def adb(querystr: list,worddict:dict):
         return resultlist
     # 只含有 not
     elif 'and' not in querystr and 'or' not in querystr:
+        querystr=[item for item in querystr if item!='('and item!=')']
         return notquery(querystr[-1])
     # 混合查询
     else:
@@ -127,9 +130,9 @@ def adb(querystr: list,worddict:dict):
                         querystack.push(notquery(firstlist))
                 operstack.pop()
             elif querystr[i] == 'and':
-                oper = operstack.pop()
-                
-                if (oper == 'and' or oper == 'or' ):
+                oper = operstack.top()
+                if (oper == 'and' or oper == 'or'):
+                    operstack.pop()
                     firstlist = querystack.pop()
                     secondlist = querystack.pop()
                     if oper == 'and':
@@ -137,13 +140,14 @@ def adb(querystr: list,worddict:dict):
                     elif oper=='or':
                         querystack.push(orquery(firstlist, secondlist))
                 elif oper == 'not':
+                    operstack.pop()
                     firstlist = querystack.pop()
                     querystack.push(notquery(firstlist))
                 operstack.push(querystr[i])
             elif querystr[i] == 'or':
-                oper=operstack.pop()
-
-                if (oper == 'and' or oper == 'or' ):
+                oper=operstack.top()
+                if (oper == 'and' or oper == 'or'):
+                    operstack.pop()
                     firstlist = querystack.pop()
                     secondlist = querystack.pop()
                     if oper == 'and':
@@ -151,6 +155,7 @@ def adb(querystr: list,worddict:dict):
                     elif oper=='or':
                         querystack.push(orquery(firstlist, secondlist))
                 elif oper == 'not':
+                    operstack.pop()
                     firstlist = querystack.pop()
                     querystack.push(notquery(firstlist))
                 operstack.push(querystr[i])
@@ -184,6 +189,8 @@ def main():
     qu = a.split()
     resu=[]
     for item in qu:
+        if (item == '(' or item == ')'):
+            resu.append(item)
         if (item.find('http') == -1):
             item = re.sub("\W+", "", item).split()
             for it in item:
