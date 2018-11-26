@@ -95,7 +95,6 @@ def compute_BM25(worddictnum: dict, pairnum: dict, doclength: dict, querydict: d
         fqd[doc] = sum
     return fqd
 
-
 def main():
     jsondict = gettext()
     [worddict,worddictnum, pairnum, doclength] = getinvertedindex(jsondict)
@@ -116,9 +115,17 @@ def main():
                                     resu[it] = 1
                                 else:
                                     resu[it] = resu[it] + 1
-        result = adb(resu.keys(), worddict, pairnum,jsondict)                         
-        BM25D=compute_BM25(worddictnum, pairnum, doclength, resu,result)
+        result = adb(resu.keys(), worddict, pairnum, jsondict)
+        for i in result[:15]:
+            print(i)                      
+        BM25D = compute_BM25(worddictnum, pairnum, doclength, resu, result)
+        sorted_BM25D = sorted(BM25D.items(), key=lambda kv: kv[1])
+        for i in sorted_BM25D[:15]:
+            print(i[0])
         PIVOT = conpute_pivotedlength(worddictnum, pairnum, doclength, resu, result)
+        sorted_PIVOT = sorted(PIVOT.items(), key=lambda kv: kv[1])
+        for i in sorted_PIVOT[:15]:
+            print(i[0])
         a=input("shuru: ")
 if __name__ == "__main__":
     main()
